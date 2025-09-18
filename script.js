@@ -81,7 +81,7 @@ class BookingSystem {
         for (let i = 0; i <= 10; i++) {
             const option = document.createElement('option');
             option.value = i;
-            option.textContent = i === 0 ? 'Выберите количество' : `${i} билет${i > 1 ? (i < 5 ? 'а' : 'ов') : ''}`;
+            option.textContent = i === 0 ? 'Select quantity' : `${i} ticket${i > 1 ? 's' : ''}`;
             select.appendChild(option);
         }
 
@@ -102,7 +102,7 @@ class BookingSystem {
     updateSubtotal(subtotalId, amount) {
         const subtotalElement = document.getElementById(subtotalId);
         if (subtotalElement) {
-            subtotalElement.textContent = amount > 0 ? `${amount.toFixed(2)} ₽` : '0 ₽';
+            subtotalElement.textContent = amount > 0 ? `€${amount.toFixed(2)}` : '€0.00';
         }
     }
 
@@ -115,7 +115,7 @@ class BookingSystem {
 
         const totalElement = document.getElementById('allSubtotal');
         if (totalElement) {
-            totalElement.textContent = `${total.toFixed(2)} ₽`;
+            totalElement.textContent = `€${total.toFixed(2)}`;
         }
     }
 
@@ -416,7 +416,7 @@ class BookingSystem {
     validateStep1() {
         const hasTickets = Object.values(this.selectedTickets).some(ticket => ticket.quantity > 0);
         if (!hasTickets) {
-            alert('Пожалуйста, выберите хотя бы один билет');
+            alert('Please select at least one ticket');
             return false;
         }
         return true;
@@ -425,7 +425,7 @@ class BookingSystem {
     // Валидация второго шага
     validateStep2() {
         if (!this.selectedDate || !this.selectedTime) {
-            alert('Пожалуйста, выберите дату и время');
+            alert('Please select date and time');
             return false;
         }
         return true;
@@ -433,7 +433,7 @@ class BookingSystem {
 
     // Валидация третьего шага
     validateStep3() {
-        console.log('Начинаем валидацию шага 3');
+        console.log('Starting step 3 validation');
         
         const firstName = document.getElementById('firstName').value.trim();
         const surname = document.getElementById('surname').value.trim();
@@ -443,7 +443,7 @@ class BookingSystem {
         const email = document.getElementById('emailAddress').value.trim();
         const emailConfirm = document.querySelector('[name="emailAddressConfirm"]').value.trim();
 
-        console.log('Данные формы:', {
+        console.log('Form data:', {
             firstName,
             surname,
             city,
@@ -454,14 +454,14 @@ class BookingSystem {
         });
 
         if (!firstName || !surname || !city || !country || !birthYear || !email || !emailConfirm) {
-            console.log('Не все поля заполнены');
-            alert('Пожалуйста, заполните все поля');
+            console.log('Not all fields are filled');
+            alert('Please fill in all fields');
             return false;
         }
 
         if (email !== emailConfirm) {
-            console.log('Email адреса не совпадают');
-            alert('Email адреса не совпадают');
+            console.log('Email addresses do not match');
+            alert('Email addresses do not match');
             return false;
         }
 
@@ -475,7 +475,7 @@ class BookingSystem {
             email
         };
 
-        console.log('Валидация прошла успешно, данные сохранены:', this.userInfo);
+        console.log('Validation successful, data saved:', this.userInfo);
         return true;
     }
 
@@ -496,7 +496,7 @@ class BookingSystem {
         // Дата и время
         const finalDate = document.getElementById('finaldate');
         if (finalDate) {
-            finalDate.textContent = `${this.selectedDate} в ${this.selectedTime}`;
+            finalDate.textContent = `${this.selectedDate} at ${this.selectedTime}`;
         }
 
         // Информация о билетах
