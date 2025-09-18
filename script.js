@@ -495,6 +495,8 @@ class BookingSystem {
         });
     }
 
+    // Инициализация селектора страны
+    initCountrySelector() {
         console.log('Initializing country selector...');
         
         const countryButton = document.getElementById('country-button');
