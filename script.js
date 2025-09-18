@@ -497,104 +497,7 @@ class BookingSystem {
 
     // Инициализация селектора страны
     initCountrySelector() {
-        console.log('Initializing country selector...');
-        
-        const countryButton = document.getElementById('country-button');
-        const countrySelect = document.getElementById('country');
-        
-        if (!countryButton || !countrySelect) {
-            console.log('Country elements not found');
-            return;
-        }
-
-        // Сохраняем выбранную страну
-        this.selectedCountry = 'Choose a country';
-        
-        // Создаем выпадающий список
-        this.createCountryDropdown(countryButton, countrySelect);
-    }
-
-    // Создание выпадающего списка стран
-    createCountryDropdown(button, select) {
-        const dropdown = document.createElement('div');
-        dropdown.className = 'country-dropdown';
-        dropdown.style.cssText = `
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background: white;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            max-height: 200px;
-            overflow-y: auto;
-            z-index: 1000;
-            display: none;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        `;
-
-        // Добавляем опции
-        const options = select.querySelectorAll('option');
-        options.forEach(option => {
-            if (option.value && option.textContent.trim() !== 'Choose a country') {
-                const item = document.createElement('div');
-                item.textContent = option.textContent.trim();
-                item.dataset.value = option.value;
-                item.style.cssText = `
-                    padding: 10px;
-                    cursor: pointer;
-                    border-bottom: 1px solid #eee;
-                `;
-                
-                item.addEventListener('mouseenter', () => {
-                    item.style.backgroundColor = '#f5f5f5';
-                });
-                
-                item.addEventListener('mouseleave', () => {
-                    item.style.backgroundColor = 'white';
-                });
-                
-                item.addEventListener('click', () => {
-                    this.selectedCountry = item.textContent;
-                    
-                    // Обновляем кнопку
-                    const buttonText = button.querySelector('.ui-selectmenu-text');
-                    if (buttonText) {
-                        buttonText.textContent = this.selectedCountry;
-                    }
-                    
-                    // Обновляем select
-                    select.value = item.dataset.value;
-                    
-                    // Закрываем dropdown
-                    dropdown.style.display = 'none';
-                    
-                    console.log('Country selected:', this.selectedCountry);
-                });
-                
-                dropdown.appendChild(item);
-            }
-        });
-
-        // Добавляем dropdown
-        button.parentNode.style.position = 'relative';
-        button.parentNode.appendChild(dropdown);
-
-        // Обработчик клика по кнопке
-        button.addEventListener('click', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            
-            const isOpen = dropdown.style.display === 'block';
-            dropdown.style.display = isOpen ? 'none' : 'block';
-        });
-
-        // Закрытие при клике вне
-        document.addEventListener('click', (e) => {
-            if (!button.contains(e.target) && !dropdown.contains(e.target)) {
-                dropdown.style.display = 'none';
-            }
-        });
+        // Функция удалена - селектор страны больше не нужен
     }
 
     // Инициализация валидации формы
@@ -647,7 +550,6 @@ class BookingSystem {
         const firstName = document.getElementById('firstName').value.trim();
         const surname = document.getElementById('surname').value.trim();
         const city = document.getElementById('city').value.trim();
-        const country = this.selectedCountry || 'Choose a country';
         const birthYear = document.getElementById('room-number').value.trim();
         const email = document.getElementById('emailAddress').value.trim();
         const emailConfirm = document.querySelector('[name="emailAddressConfirm"]').value.trim();
@@ -656,13 +558,12 @@ class BookingSystem {
             firstName,
             surname,
             city,
-            country,
             birthYear,
             email,
             emailConfirm
         });
 
-        if (!firstName || !surname || !city || country === 'Choose a country' || !birthYear || !email || !emailConfirm) {
+        if (!firstName || !surname || !city || !birthYear || !email || !emailConfirm) {
             console.log('Not all fields are filled');
             alert('Please fill in all fields');
             return false;
@@ -679,7 +580,6 @@ class BookingSystem {
             firstName,
             surname,
             city,
-            country,
             birthYear,
             email
         };
