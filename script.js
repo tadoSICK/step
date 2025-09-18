@@ -502,55 +502,78 @@ class BookingSystem {
 
         if (!countryButton || !countryList) return;
 
+        // Переменная для хранения выбранной страны
+        let selectedCountry = '';
+        let isListOpen = false;
+
         // Стилизация списка стран
-        countryList.style.cssText = `
-            display: none;
-            position: absolute;
-            background: white;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            max-height: 200px;
-            overflow-y: auto;
-            z-index: 1000;
-            width: 100%;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        `;
+        countryList.style.display = 'none';
+        countryList.style.position = 'absolute';
+        countryList.style.background = 'white';
+        countryList.style.border = '1px solid #ddd';
+        countryList.style.borderRadius = '5px';
+        countryList.style.maxHeight = '200px';
+        countryList.style.overflowY = 'auto';
+        countryList.style.zIndex = '1000';
+        countryList.style.width = '100%';
+        countryList.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
 
-        // Стилизация элементов списка
-        const countryItems = countryList.querySelectorAll('*');
-        countryItems.forEach(item => {
-            if (item.textContent.trim()) {
-                item.style.cssText = `
-                    padding: 10px;
-                    cursor: pointer;
-                    border-bottom: 1px solid #eee;
-                `;
+        // Обработка кликов по кнопке
+        countryButton.addEventListener('click', () => {
+            isListOpen = !isListOpen;
+            countryList.style.display = isListOpen ? 'block' : 'none';
+        });
+
+        // Обработка выбора страны
+        countryList.addEventListener('click', (e) => {
+            if (e.target.tagName === 'OPTION' && e.target.textContent.trim() !== 'Choose a country') {
+                selectedCountry = e.target.textContent.trim();
+                const buttonText = countryButton.querySelector('.ui-selectmenu-text');
+                if (buttonText) {
+                    buttonText.textContent = selectedCountry;
+                }
+                countryList.style.display = 'none';
+                isListOpen = false;
+                console.log('Selected country:', selectedCountry);
+            }
+        });
+
+        // Стилизация опций
+        const options = countryList.querySelectorAll('option');
+        options.forEach(option => {
+            if (option.textContent.trim() && option.textContent.trim() !== 'Choose a country') {
+                option.style.padding = '10px';
+                option.style.cursor = 'pointer';
+                option.style.borderBottom = '1px solid #eee';
                 
-                item.addEventListener('mouseenter', () => {
-                    item.style.backgroundColor = '#f5f5f5';
+                option.addEventListener('mouseenter', () => {
+                    option.style.backgroundColor = '#f5f5f5';
                 });
                 
-                item.addEventListener('mouseleave', () => {
-                    item.style.backgroundColor = 'white';
-                });
-
-                item.addEventListener('click', () => {
-                    countryButton.textContent = item.textContent.trim();
-                    countryList.style.display = 'none';
+                option.addEventListener('mouseleave', () => {
+                    option.style.backgroundColor = 'white';
                 });
             }
         });
 
-        // Показать/скрыть список при клике на кнопку
-        countryButton.addEventListener('click', () => {
-            countryList.style.display = countryList.style.display === 'none' ? 'block' : 'none';
-        });
-
-        // Скрыть список при клике вне его
+        // Закрытие списка при клике вне его
         document.addEventListener('click', (e) => {
             if (!countryButton.contains(e.target) && !countryList.contains(e.target)) {
                 countryList.style.display = 'none';
+                isListOpen = false;
             }
+        });
+
+        // Сохранение выбранной страны при потере фокуса
+        countryButton.addEventListener('blur', () => {
+            setTimeout(() => {
+                if (selectedCountry) {
+                    const buttonText = countryButton.querySelector('.ui-selectmenu-text');
+                    if (buttonText) {
+                        buttonText.textContent = selectedCountry;
+                    }
+                }
+            }, 100);
         });
     }
 
