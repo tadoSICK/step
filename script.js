@@ -233,12 +233,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // Небольшая задержка для загрузки всех элементов
     setTimeout(() => {
         // Создаем селекторы для всех типов билетов
-        createTicketSelector('adult-button', 'adult-price', 'subtotal-adult', 'adult');
-        createTicketSelector('under18-button', 'under18-price', 'subtotal-under18', 'under18');
-        createTicketSelector('muse-button', 'muse-price', 'subtotal-muse', 'muse');
-        createTicketSelector('student-button', 'student-price', 'subtotal-student', 'student');
-        createTicketSelector('auditor-button', 'auditor-price', 'subtotal-auditor', 'auditor');
-        createTicketSelector('child-button', 'child-price', 'subtotal-child', 'child');
+        createTicketSelector('adult', 'adult-price', 'subtotal-adult', 'adult');
+        createTicketSelector('under18', 'under18-price', 'subtotal-under18', 'under18');
+        createTicketSelector('muse', 'muse-price', 'subtotal-muse', 'muse');
+        createTicketSelector('student', 'student-price', 'subtotal-student', 'student');
+        createTicketSelector('auditor', 'auditor-price', 'subtotal-auditor', 'auditor');
+        createTicketSelector('child', 'child-price', 'subtotal-child', 'child');
         
         // Настраиваем календарь и выбор времени
         setupCalendar();
