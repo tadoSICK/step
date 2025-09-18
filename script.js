@@ -197,30 +197,98 @@ function setupEventListeners() {
 function setupCalendar() {
     const calendar = document.getElementById('dp1758166138189');
     if (calendar) {
-        // Обработчик клика по датам в календаре
-        calendar.addEventListener('click', function(e) {
-            if (e.target.tagName === 'TD' && e.target.textContent.trim()) {
-                // Убираем выделение с других дат
-                const allDates = calendar.querySelectorAll('td');
-                allDates.forEach(td => td.classList.remove('selected-date'));
-                
-                // Выделяем выбранную дату
-                e.target.classList.add('selected-date');
-                e.target.style.backgroundColor = '#007bff';
-                e.target.style.color = 'white';
-                
-                // Сохраняем выбранную дату
-                const day = e.target.textContent.trim();
-                const monthYear = calendar.querySelector('.ui-datepicker-title');
-                if (monthYear) {
-                    bookingData.selectedDate = `${day} ${monthYear.textContent}`;
-                }
-                
-                // Показываем блок выбора времени
-                showTimeSlots();
-            }
-        });
+        // Используем делегирование событий для динамического контента
+        setupCalendarEventDelegation(calendar);
+        
+        // Также проверяем существующие даты при инициализации
+        setTimeout(() => {
+            setupExistingCalendarDates(calendar);
+        }, 100);
     }
+}
+
+function setupCalendarEventDelegation(calendar) {
+    // Используем делегирование событий для обработки кликов по датам
+    calendar.addEventListener('click', function(e) {
+        const target = e.target;
+        
+        // Проверяем различные возможные селекторы для дат
+        if ((target.tagName === 'TD' || target.tagName === 'A' || target.classList.contains('ui-state-default')) 
+            && target.textContent.trim() && !target.classList.contains('ui-state-disabled')) {
+            
+            e.preventDefault();
+            e.stopPropagation();
+            
+            // Убираем выделение с других дат
+            const allDates = calendar.querySelectorAll('td, a, .ui-state-default');
+            allDates.forEach(element => {
+                element.classList.remove('selected-date');
+                element.style.backgroundColor = '';
+                element.style.color = '';
+            });
+            
+            // Выделяем выбранную дату
+            target.classList.add('selected-date');
+            target.style.backgroundColor = '#007bff !important';
+            target.style.color = 'white !important';
+            
+            // Сохраняем выбранную дату
+            const day = target.textContent.trim();
+            const monthYear = calendar.querySelector('.ui-datepicker-title, .ui-datepicker-month, .ui-datepicker-year');
+            let dateString = day;
+            
+            if (monthYear) {
+                dateString = `${day} ${monthYear.textContent}`;
+            } else {
+                // Попробуем найти месяц и год другими способами
+                const month = calendar.querySelector('.ui-datepicker-month');
+                const year = calendar.querySelector('.ui-datepicker-year');
+                if (month && year) {
+                    dateString = `${day} ${month.textContent} ${year.textContent}`;
+                }
+            }
+            
+            bookingData.selectedDate = dateString;
+            console.log('Выбрана дата:', bookingData.selectedDate);
+            
+            // Показываем блок выбора времени
+            showTimeSlots();
+        }
+    });
+    
+    // Обработчик для кнопок навигации по месяцам
+    calendar.addEventListener('click', function(e) {
+        if (e.target.classList.contains('ui-datepicker-next') || 
+            e.target.classList.contains('ui-datepicker-prev')) {
+            // Переинициализируем обработчики после смены месяца
+            setTimeout(() => {
+                setupExistingCalendarDates(calendar);
+            }, 100);
+        }
+    });
+}
+
+function setupExistingCalendarDates(calendar) {
+    // Находим все возможные элементы дат и добавляем им стили для hover
+    const dateElements = calendar.querySelectorAll('td a, .ui-state-default, td[data-handler="selectDay"]');
+    dateElements.forEach(element => {
+        if (element.textContent.trim() && !element.classList.contains('ui-state-disabled')) {
+            element.style.cursor = 'pointer';
+            
+            // Добавляем hover эффекты
+            element.addEventListener('mouseenter', function() {
+                if (!this.classList.contains('selected-date')) {
+                    this.style.backgroundColor = '#e3f2fd';
+                }
+            });
+            
+            element.addEventListener('mouseleave', function() {
+                if (!this.classList.contains('selected-date')) {
+                    this.style.backgroundColor = '';
+                }
+            });
+        }
+    });
 }
 
 function showTimeSlots() {
@@ -228,10 +296,56 @@ function showTimeSlots() {
     if (timeslotSection) {
         timeslotSection.style.display = 'block';
         
-        // Обработчик выбора времени
-        const timeSlots = timeslotSection.querySelectorAll('.timeslots-container');
+        // Обработчик выбора времени - ищем все возможные селекторы
+        const timeSlots = timeslotSection.querySelectorAll('.timeslots-container, .timeslot, [class*="timeslot"]');
+        
+        console.log('Найдено временных слотов:', timeSlots.length);
+        
         timeSlots.forEach(slot => {
-            slot.addEventListener('click', function() {
+            slot.style.cursor = 'pointer';
+            
+            // Убираем старые обработчики и добавляем новые
+            slot.removeEventListener('click', handleTimeSlotClick);
+            slot.addEventListener('click', handleTimeSlotClick);
+            
+            // Добавляем hover эффекты
+            slot.addEventListener('mouseenter', function() {
+                if (!this.classList.contains('selected-time')) {
+                    this.style.backgroundColor = '#e3f2fd';
+                }
+            });
+            
+            slot.addEventListener('mouseleave', function() {
+                if (!this.classList.contains('selected-time')) {
+                    this.style.backgroundColor = '';
+                }
+            });
+        });
+    }
+}
+
+function handleTimeSlotClick() {
+    const timeslotSection = document.getElementById('timeslot-section');
+    if (timeslotSection) {
+        const timeSlots = timeslotSection.querySelectorAll('.timeslots-container, .timeslot, [class*="timeslot"]');
+        
+        // Убираем выделение с других слотов
+        timeSlots.forEach(s => {
+            s.classList.remove('selected-time');
+            s.style.backgroundColor = '';
+            s.style.color = '';
+        });
+        
+        // Выделяем выбранный слот
+        this.classList.add('selected-time');
+        this.style.backgroundColor = '#007bff !important';
+        this.style.color = 'white !important';
+        
+        // Сохраняем выбранное время
+        bookingData.selectedTime = this.textContent.trim();
+        console.log('Выбрано время:', bookingData.selectedTime);
+    }
+}
                 // Убираем выделение с других слотов
                 timeSlots.forEach(s => s.classList.remove('selected-time'));
                 
@@ -340,8 +454,21 @@ function validateStep1() {
 }
 
 function validateStep2() {
+    console.log('Проверка шага 2:', {
+        selectedDate: bookingData.selectedDate,
+        selectedTime: bookingData.selectedTime
+    });
+    
     if (!bookingData.selectedDate || !bookingData.selectedTime) {
-        alert('Пожалуйста, выберите дату и время');
+        let message = 'Пожалуйста, выберите ';
+        if (!bookingData.selectedDate && !bookingData.selectedTime) {
+            message += 'дату и время';
+        } else if (!bookingData.selectedDate) {
+            message += 'дату';
+        } else {
+            message += 'время';
+        }
+        alert(message);
         return false;
     }
     return true;
@@ -420,11 +547,14 @@ const additionalStyles = `
     .selected-date {
         background-color: #007bff !important;
         color: white !important;
+        font-weight: bold !important;
     }
     
     .selected-time {
         background-color: #007bff !important;
         color: white !important;
+        font-weight: bold !important;
+        border: 2px solid #0056b3 !important;
     }
     
     .ticket-quantity-select:focus {
@@ -439,6 +569,47 @@ const additionalStyles = `
     
     #timeslot-section {
         display: none;
+        margin-top: 20px;
+        padding: 15px;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        background-color: #f8f9fa;
+    }
+    
+    .timeslots-container, .timeslot, [class*="timeslot"] {
+        transition: all 0.2s ease;
+        margin: 5px;
+        padding: 8px 12px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        display: inline-block;
+        background-color: white;
+    }
+    
+    .timeslots-container:hover, .timeslot:hover, [class*="timeslot"]:hover {
+        background-color: #e3f2fd !important;
+        transform: translateY(-1px);
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    #dp1758166138189 td {
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    #dp1758166138189 td:hover {
+        background-color: #e3f2fd !important;
+        transform: scale(1.05);
+    }
+    
+    #dp1758166138189 .ui-state-default {
+        cursor: pointer !important;
+        transition: all 0.2s ease;
+    }
+    
+    #dp1758166138189 .ui-state-default:hover {
+        background-color: #e3f2fd !important;
+        color: #007bff !important;
     }
 `;
 
