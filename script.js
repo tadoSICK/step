@@ -23,11 +23,15 @@ class BookingSystem {
 
     // Показать определенный шаг
     showStep(stepId) {
+        console.log('Показываем шаг:', stepId);
         const steps = ['stepOne', 'stepTwo', 'stepThree', 'stepFoo', 'stepFive'];
         steps.forEach(step => {
             const element = document.getElementById(step);
             if (element) {
                 element.style.display = step === stepId ? 'block' : 'none';
+                console.log(`Шаг ${step}: display = ${element.style.display}`);
+            } else {
+                console.log(`Элемент ${step} не найден!`);
             }
         });
     }
@@ -141,9 +145,13 @@ class BookingSystem {
         const goFooStep = document.getElementById('goFooStep');
         if (goFooStep) {
             goFooStep.addEventListener('click', () => {
+                console.log('Клик по кнопке goFooStep');
                 if (this.validateStep3()) {
+                    console.log('Валидация шага 3 прошла успешно');
                     this.fillFinalInfo();
                     this.showStep('stepFoo');
+                } else {
+                    console.log('Валидация шага 3 не прошла');
                 }
             });
         }
@@ -424,6 +432,8 @@ class BookingSystem {
 
     // Валидация третьего шага
     validateStep3() {
+        console.log('Начинаем валидацию шага 3');
+        
         const firstName = document.getElementById('firstName').value.trim();
         const surname = document.getElementById('surname').value.trim();
         const city = document.getElementById('city').value.trim();
@@ -432,12 +442,24 @@ class BookingSystem {
         const email = document.getElementById('emailAddress').value.trim();
         const emailConfirm = document.querySelector('[name="emailAddressConfirm"]').value.trim();
 
+        console.log('Данные формы:', {
+            firstName,
+            surname,
+            city,
+            country,
+            birthYear,
+            email,
+            emailConfirm
+        });
+
         if (!firstName || !surname || !city || !country || !birthYear || !email || !emailConfirm) {
+            console.log('Не все поля заполнены');
             alert('Пожалуйста, заполните все поля');
             return false;
         }
 
         if (email !== emailConfirm) {
+            console.log('Email адреса не совпадают');
             alert('Email адреса не совпадают');
             return false;
         }
@@ -452,6 +474,7 @@ class BookingSystem {
             email
         };
 
+        console.log('Валидация прошла успешно, данные сохранены:', this.userInfo);
         return true;
     }
 
