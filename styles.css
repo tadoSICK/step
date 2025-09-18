@@ -99,25 +99,25 @@
 }
 
 .icon.arrow-head-right:before {
-    content: ""
+    content: ""
 }
 
 .icon.triangle-down:before {
-    content: ""
+    content: ""
 }
 
 .icon.check:before {
-    content: "";
+    content: "";
     padding: 2px 1px;
     border: 2px solid #BBB
 }
 
 .icon.arrow-right:before {
-    content: ""
+    content: ""
 }
 
 .icon.info-circle:before {
-    content: ""
+    content: ""
 }
 
 
@@ -6161,4 +6161,43 @@ border-right-color: #ffffff;
 
 #stepTwo, #stepThree, #stepFoo, #stepFive{
     display: none;
+}
+
+.ticket-quantity-select:focus {
+  outline: none !important;
+  border-color: #4a90e2 !important;
+  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2) !important;
+  transform: translateY(-1px);
+}
+
+.ticket-quantity-select {
+  background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%) !important;
+  border: 2px solid #e1e8ed !important;
+  border-radius: 8px !important;
+  padding: 10px 35px 10px 12px !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  color: #2c3e50 !important;
+  cursor: pointer !important;
+  transition: all 0.3s ease !important;
+  min-width: 80px !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234a90e2' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 10px center !important;
+  background-size: 16px !important;
+}
+
+.ticket-quantity-select:hover {
+  border-color: #4a90e2 !important;
+  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.15) !important;
+  transform: translateY(-2px) !important;
+}
+
+.ticket-quantity-select option {
+  padding: 8px 12px !important;
+  background: white !important;
+  color: #2c3e50 !important;
 }

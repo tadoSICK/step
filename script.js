@@ -257,14 +257,47 @@ function setupCalendarEventDelegation(calendar) {
     });
     
     // Обработчик для кнопок навигации по месяцам
+    setupCalendarNavigation(calendar);
+}
+
+function setupCalendarNavigation(calendar) {
+    // Обработчик для кнопок навигации по месяцам
     calendar.addEventListener('click', function(e) {
-        if (e.target.classList.contains('ui-datepicker-next') || 
-            e.target.classList.contains('ui-datepicker-prev')) {
+        const target = e.target;
+        
+        // Проверяем различные возможные селекторы для кнопок навигации
+        if (target.classList.contains('ui-datepicker-next') || 
+            target.classList.contains('ui-datepicker-prev') ||
+            target.classList.contains('ui-corner-all') ||
+            target.closest('.ui-datepicker-next') ||
+            target.closest('.ui-datepicker-prev')) {
+            
+            console.log('Нажата кнопка навигации календаря');
+            
             // Переинициализируем обработчики после смены месяца
             setTimeout(() => {
                 setupExistingCalendarDates(calendar);
-            }, 100);
+                console.log('Переинициализированы обработчики календаря');
+            }, 200);
         }
+    });
+    
+    // Дополнительный обработчик для элементов внутри кнопок навигации
+    const navButtons = calendar.querySelectorAll('.ui-datepicker-next, .ui-datepicker-prev, .ui-corner-all');
+    navButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            console.log('Клик по кнопке навигации:', this.className);
+            
+            // Переинициализируем обработчики после смены месяца
+            setTimeout(() => {
+                setupExistingCalendarDates(calendar);
+                console.log('Обработчики календаря обновлены');
+            }, 200);
+        });
+        
+        // Делаем кнопки более кликабельными
+        button.style.cursor = 'pointer';
+        button.style.userSelect = 'none';
     });
 }
 
