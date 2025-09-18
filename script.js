@@ -23,7 +23,7 @@ class BookingSystem {
 
     // Показать определенный шаг
     showStep(stepId) {
-        const steps = ['stepOne', 'stepTwo', 'stepThree', 'stepFour', 'stepFive'];
+        const steps = ['stepOne', 'stepTwo', 'stepThree', 'stepFoo', 'stepFive'];
         steps.forEach(step => {
             const element = document.getElementById(step);
             if (element) {
@@ -143,7 +143,7 @@ class BookingSystem {
             goFooStep.addEventListener('click', () => {
                 if (this.validateStep3()) {
                     this.fillFinalInfo();
-                    this.showStep('stepFour');
+                    this.showStep('stepFoo');
                 }
             });
         }
@@ -160,37 +160,39 @@ class BookingSystem {
     // Инициализация календаря
     initCalendar() {
         console.log('Инициализация календаря...');
-        
-        // Блокируем все ссылки в календаре и обрабатываем клики
-        document.addEventListener('click', (e) => {
             // Если клик по ссылке внутри календаря - блокируем переход
             if (e.target.tagName === 'A' && e.target.closest('#dp1758166138189')) {
-                e.preventDefault(); // Блокируем переход по ссылке
-                console.log('Клик по дате-ссылке:', e.target.textContent);
-                this.handleDateClick(e.target);
-                return false;
+                // Проверяем, что это не кнопка навигации
+                if (!e.target.classList.contains('ui-datepicker-next') && 
+                    !e.target.classList.contains('ui-datepicker-prev')) {
+                    e.preventDefault(); // Блокируем переход по ссылке
+                    console.log('Клик по дате-ссылке:', e.target.textContent);
+                    this.handleDateClick(e.target);
+                    return false;
+                }, 200);
             }
             
             // Обработка кликов по датам в календаре (если это TD)
             if (e.target.tagName === 'TD' && e.target.closest('#dp1758166138189')) {
-                console.log('Клик по TD:', e.target.textContent);
-                this.handleDateClick(e.target);
-            }
-            
-            // Обработка кликов по кнопкам навигации календаря
-            if (e.target.classList.contains('ui-datepicker-next') || 
-                e.target.classList.contains('ui-datepicker-prev')) {
-                console.log('Переключение месяца');
-                setTimeout(() => {
-                    console.log('Месяц переключен, обновляем календарь');
-                    this.updateCalendarClickHandlers();
-                }, 200);
+                // Проверяем что это не пустая ячейка и не заблокированная дата
+                if (e.target.textContent.trim() && 
+                    !e.target.classList.contains('ui-datepicker-unselectable') &&
+                    !e.target.classList.contains('ui-datepicker-other-month')) {
+                    console.log('Клик по TD:', e.target.textContent);
+                    this.handleDateClick(e.target);
+                }
             }
         });
         
         // Инициализируем выбор времени
         this.initTimeSlots();
         
+        // Показываем блок выбора времени если дата уже выбрана
+        const timeslotSection = document.getElementById('timeslot-section');
+        if (timeslotSection) {
+            timeslotSection.style.display = 'block';
+        }
+    }
         // Обновляем обработчики для календаря
         this.updateCalendarClickHandlers();
     }
@@ -214,7 +216,16 @@ class BookingSystem {
 
     // Обработчик клика по дате
     handleDateClick(element) {
-        const dateText = element.textContent.trim();
+        let dateText;
+        
+        // Если это ссылка, берем текст из неё
+        if (element.tagName === 'A') {
+            dateText = element.textContent.trim();
+        } else {
+            // Если это TD, ищем ссылку внутри или берем текст
+            const link = element.querySelector('a');
+            dateText = link ? link.textContent.trim() : element.textContent.trim();
+        }
         
         console.log('Обработка клика по дате:', dateText);
         
@@ -236,16 +247,22 @@ class BookingSystem {
             }
 
             // Выделяем выбранную дату
-            const clickedCell = element.tagName === 'A' ? element.closest('td') || element : element;
+            const clickedCell = element.tagName === 'A' ? element.closest('td') : element;
             clickedCell.style.backgroundColor = '#007bff';
             clickedCell.style.color = 'white';
+            
+            // Также выделяем ссылку внутри если есть
+            const linkInCell = clickedCell.querySelector('a');
+            if (linkInCell) {
+                linkInCell.style.backgroundColor = '#007bff';
+                linkInCell.style.color = 'white';
+            }
 
             // Получаем полную дату
             let fullDate = dateText;
-            const calendarElement = document.getElementById('dp1758166138189');
-            if (calendarElement) {
-                const monthElement = calendarElement.querySelector('.ui-datepicker-month');
-                const yearElement = calendarElement.querySelector('.ui-datepicker-year');
+            if (calendar) {
+                const monthElement = calendar.querySelector('.ui-datepicker-month');
+                const yearElement = calendar.querySelector('.ui-datepicker-year');
                 
                 if (monthElement && yearElement) {
                     const month = monthElement.textContent.trim();
@@ -263,6 +280,12 @@ class BookingSystem {
             if (timeslotSection) {
                 timeslotSection.style.display = 'block';
                 console.log('Показан блок выбора времени');
+            }
+            
+            // Показываем кнопку "Next step"
+            const nextButton = document.getElementById('goThreeStep');
+            if (nextButton) {
+                nextButton.style.display = 'block';
             }
         }
     }
