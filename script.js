@@ -161,32 +161,62 @@ class BookingSystem {
     initCalendar() {
         console.log('Инициализация календаря...');
         
-        // Используем делегирование событий для всего документа
+        // Блокируем все ссылки в календаре и обрабатываем клики
         document.addEventListener('click', (e) => {
-            // Обработка кликов по датам в календаре
+            // Если клик по ссылке внутри календаря - блокируем переход
+            if (e.target.tagName === 'A' && e.target.closest('#dp1758166138189')) {
+                e.preventDefault(); // Блокируем переход по ссылке
+                console.log('Клик по дате-ссылке:', e.target.textContent);
+                this.handleDateClick(e.target);
+                return false;
+            }
+            
+            // Обработка кликов по датам в календаре (если это TD)
             if (e.target.tagName === 'TD' && e.target.closest('#dp1758166138189')) {
-                this.handleDateClick(e);
+                console.log('Клик по TD:', e.target.textContent);
+                this.handleDateClick(e.target);
             }
             
             // Обработка кликов по кнопкам навигации календаря
             if (e.target.classList.contains('ui-datepicker-next') || 
                 e.target.classList.contains('ui-datepicker-prev')) {
+                console.log('Переключение месяца');
                 setTimeout(() => {
                     console.log('Месяц переключен, обновляем календарь');
+                    this.updateCalendarClickHandlers();
                 }, 200);
             }
         });
         
         // Инициализируем выбор времени
         this.initTimeSlots();
+        
+        // Обновляем обработчики для календаря
+        this.updateCalendarClickHandlers();
+    }
+    
+    // Обновление обработчиков кликов для календаря
+    updateCalendarClickHandlers() {
+        const calendar = document.getElementById('dp1758166138189');
+        if (calendar) {
+            // Находим все ссылки в календаре и блокируем их
+            const dateLinks = calendar.querySelectorAll('a');
+            dateLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    console.log('Заблокирован переход по ссылке:', link.textContent);
+                    this.handleDateClick(link);
+                    return false;
+                });
+            });
+        }
     }
 
     // Обработчик клика по дате
-    handleDateClick(e) {
-        const clickedCell = e.target;
-        const dateText = clickedCell.textContent.trim();
+    handleDateClick(element) {
+        const dateText = element.textContent.trim();
         
-        console.log('Клик по ячейке:', dateText);
+        console.log('Обработка клика по дате:', dateText);
         
         // Проверяем, что это дата (не пустая ячейка и не заголовок)
         if (dateText && !isNaN(dateText) && dateText !== '') {
@@ -195,6 +225,10 @@ class BookingSystem {
             // Убираем выделение с других дат
             const calendar = document.getElementById('dp1758166138189');
             if (calendar) {
+                calendar.querySelectorAll('td, a').forEach(el => {
+                    el.style.backgroundColor = '';
+                    el.style.color = '';
+                });
                 calendar.querySelectorAll('td').forEach(td => {
                     td.style.backgroundColor = '';
                     td.style.color = '';
@@ -202,6 +236,7 @@ class BookingSystem {
             }
 
             // Выделяем выбранную дату
+            const clickedCell = element.tagName === 'A' ? element.closest('td') || element : element;
             clickedCell.style.backgroundColor = '#007bff';
             clickedCell.style.color = 'white';
 
