@@ -495,86 +495,109 @@ class BookingSystem {
         });
     }
 
-    // Инициализация селектора страны
-    initCountrySelector() {
+        console.log('Initializing country selector...');
+        
         const countryButton = document.getElementById('country-button');
-        const countryList = document.getElementById('country');
+        const countrySelect = document.getElementById('country');
+        
+        if (!countryButton || !countrySelect) {
+            console.log('Country elements not found');
+            return;
+        }
 
-        if (!countryButton || !countryList) return;
+        let selectedCountryValue = '';
+        let selectedCountryText = 'Choose a country';
+        let isOpen = false;
 
-        // Переменная для хранения выбранной страны
-        let selectedCountry = '';
-        let isListOpen = false;
+        // Создаем кастомный выпадающий список
+        const dropdown = document.createElement('div');
+        dropdown.className = 'custom-country-dropdown';
+        dropdown.style.cssText = `
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        `;
 
-        // Стилизация списка стран
-        countryList.style.display = 'none';
-        countryList.style.position = 'absolute';
-        countryList.style.background = 'white';
-        countryList.style.border = '1px solid #ddd';
-        countryList.style.borderRadius = '5px';
-        countryList.style.maxHeight = '200px';
-        countryList.style.overflowY = 'auto';
-        countryList.style.zIndex = '1000';
-        countryList.style.width = '100%';
-        countryList.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
-
-        // Обработка кликов по кнопке
-        countryButton.addEventListener('click', () => {
-            isListOpen = !isListOpen;
-            countryList.style.display = isListOpen ? 'block' : 'none';
-        });
-
-        // Обработка выбора страны
-        countryList.addEventListener('click', (e) => {
-            if (e.target.tagName === 'OPTION' && e.target.textContent.trim() !== 'Choose a country') {
-                selectedCountry = e.target.textContent.trim();
-                const buttonText = countryButton.querySelector('.ui-selectmenu-text');
-                if (buttonText) {
-                    buttonText.textContent = selectedCountry;
-                }
-                countryList.style.display = 'none';
-                isListOpen = false;
-                console.log('Selected country:', selectedCountry);
-            }
-        });
-
-        // Стилизация опций
-        const options = countryList.querySelectorAll('option');
+        // Заполняем dropdown опциями
+        const options = countrySelect.querySelectorAll('option');
         options.forEach(option => {
-            if (option.textContent.trim() && option.textContent.trim() !== 'Choose a country') {
-                option.style.padding = '10px';
-                option.style.cursor = 'pointer';
-                option.style.borderBottom = '1px solid #eee';
+            if (option.value && option.textContent.trim() !== 'Choose a country') {
+                const item = document.createElement('div');
+                item.className = 'dropdown-item';
+                item.textContent = option.textContent.trim();
+                item.dataset.value = option.value;
+                item.style.cssText = `
+                    padding: 10px;
+                    cursor: pointer;
+                    border-bottom: 1px solid #eee;
+                `;
                 
-                option.addEventListener('mouseenter', () => {
-                    option.style.backgroundColor = '#f5f5f5';
+                item.addEventListener('mouseenter', () => {
+                    item.style.backgroundColor = '#f5f5f5';
                 });
                 
-                option.addEventListener('mouseleave', () => {
-                    option.style.backgroundColor = 'white';
+                item.addEventListener('mouseleave', () => {
+                    item.style.backgroundColor = 'white';
                 });
-            }
-        });
-
-        // Закрытие списка при клике вне его
-        document.addEventListener('click', (e) => {
-            if (!countryButton.contains(e.target) && !countryList.contains(e.target)) {
-                countryList.style.display = 'none';
-                isListOpen = false;
-            }
-        });
-
-        // Сохранение выбранной страны при потере фокуса
-        countryButton.addEventListener('blur', () => {
-            setTimeout(() => {
-                if (selectedCountry) {
+                
+                item.addEventListener('click', () => {
+                    selectedCountryValue = item.dataset.value;
+                    selectedCountryText = item.textContent;
+                    
+                    // Обновляем текст кнопки
                     const buttonText = countryButton.querySelector('.ui-selectmenu-text');
                     if (buttonText) {
-                        buttonText.textContent = selectedCountry;
+                        buttonText.textContent = selectedCountryText;
                     }
-                }
-            }, 100);
+                    
+                    // Устанавливаем значение в оригинальный select
+                    countrySelect.value = selectedCountryValue;
+                    
+                    // Закрываем dropdown
+                    dropdown.style.display = 'none';
+                    isOpen = false;
+                    
+                    console.log('Country selected:', selectedCountryText, selectedCountryValue);
+                });
+                
+                dropdown.appendChild(item);
+            }
         });
+
+        // Добавляем dropdown после кнопки
+        countryButton.parentNode.style.position = 'relative';
+        countryButton.parentNode.appendChild(dropdown);
+
+        // Обработчик клика по кнопке
+        countryButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            isOpen = !isOpen;
+            dropdown.style.display = isOpen ? 'block' : 'none';
+            
+            console.log('Button clicked, dropdown open:', isOpen);
+        });
+
+        // Закрытие при клике вне элемента
+        document.addEventListener('click', (e) => {
+            if (!countryButton.contains(e.target) && !dropdown.contains(e.target)) {
+                dropdown.style.display = 'none';
+                isOpen = false;
+            }
+        });
+
+        // Сохраняем выбранное значение в валидации
+        this.getSelectedCountry = () => selectedCountryText;
     }
 
     // Инициализация валидации формы
@@ -627,7 +650,7 @@ class BookingSystem {
         const firstName = document.getElementById('firstName').value.trim();
         const surname = document.getElementById('surname').value.trim();
         const city = document.getElementById('city').value.trim();
-        const country = document.getElementById('country-button').textContent.trim();
+        const country = this.getSelectedCountry ? this.getSelectedCountry() : 'Choose a country';
         const birthYear = document.getElementById('room-number').value.trim();
         const email = document.getElementById('emailAddress').value.trim();
         const emailConfirm = document.querySelector('[name="emailAddressConfirm"]').value.trim();
@@ -642,7 +665,7 @@ class BookingSystem {
             emailConfirm
         });
 
-        if (!firstName || !surname || !city || !country || !birthYear || !email || !emailConfirm) {
+        if (!firstName || !surname || !city || country === 'Choose a country' || !birthYear || !email || !emailConfirm) {
             console.log('Not all fields are filled');
             alert('Please fill in all fields');
             return false;
