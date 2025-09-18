@@ -160,6 +160,9 @@ class BookingSystem {
     // Инициализация календаря
     initCalendar() {
         console.log('Инициализация календаря...');
+        
+        // Добавляем обработчик кликов для календаря
+        document.addEventListener('click', (e) => {
             // Если клик по ссылке внутри календаря - блокируем переход
             if (e.target.tagName === 'A' && e.target.closest('#dp1758166138189')) {
                 // Проверяем, что это не кнопка навигации
@@ -169,7 +172,7 @@ class BookingSystem {
                     console.log('Клик по дате-ссылке:', e.target.textContent);
                     this.handleDateClick(e.target);
                     return false;
-                }, 200);
+                }
             }
             
             // Обработка кликов по датам в календаре (если это TD)
@@ -192,7 +195,7 @@ class BookingSystem {
         if (timeslotSection) {
             timeslotSection.style.display = 'block';
         }
-    }
+        
         // Обновляем обработчики для календаря
         this.updateCalendarClickHandlers();
     }
