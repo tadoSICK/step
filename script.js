@@ -170,6 +170,13 @@ class BookingSystem {
     initCalendar() {
         console.log('Инициализация календаря...');
         
+        // Инициализируем календарь с текущей датой
+        this.currentCalendarDate = new Date();
+        this.updateCalendarDisplay();
+        
+        // Добавляем обработчики для кнопок навигации
+        this.initCalendarNavigation();
+        
         // Добавляем обработчик кликов для календаря
         document.addEventListener('click', (e) => {
             // Если клик по ссылке внутри календаря - блокируем переход
@@ -207,6 +214,165 @@ class BookingSystem {
         
         // Обновляем обработчики для календаря
         this.updateCalendarClickHandlers();
+    }
+
+    // Инициализация навигации календаря
+    initCalendarNavigation() {
+        const calendar = document.getElementById('dp1758166138189');
+        if (!calendar) return;
+
+        // Обработчик для кнопки "Next"
+        calendar.addEventListener('click', (e) => {
+            if (e.target.closest('.ui-datepicker-next')) {
+                e.preventDefault();
+                this.navigateCalendar(1);
+            }
+            
+            if (e.target.closest('.ui-datepicker-prev')) {
+                e.preventDefault();
+                this.navigateCalendar(-1);
+            }
+        });
+    }
+
+    // Навигация по месяцам
+    navigateCalendar(direction) {
+        // direction: 1 для следующего месяца, -1 для предыдущего
+        this.currentCalendarDate.setMonth(this.currentCalendarDate.getMonth() + direction);
+        this.updateCalendarDisplay();
+    }
+
+    // Обновление отображения календаря
+    updateCalendarDisplay() {
+        const calendar = document.getElementById('dp1758166138189');
+        if (!calendar) return;
+
+        const monthNames = [
+            'January', 'February', 'March', 'April', 'May', 'June',
+            'July', 'August', 'September', 'October', 'November', 'December'
+        ];
+
+        const currentMonth = this.currentCalendarDate.getMonth();
+        const currentYear = this.currentCalendarDate.getFullYear();
+        
+        // Обновляем заголовок
+        const monthElement = calendar.querySelector('.ui-datepicker-month');
+        const yearElement = calendar.querySelector('.ui-datepicker-year');
+        const titleElement = calendar.querySelector('.ui-datepicker-title');
+        
+        if (monthElement) monthElement.textContent = monthNames[currentMonth];
+        if (yearElement) yearElement.textContent = currentYear;
+        if (titleElement) {
+            titleElement.setAttribute('aria-label', `Current month: ${monthNames[currentMonth]} ${currentYear}`);
+        }
+
+        // Генерируем календарь для текущего месяца
+        this.generateCalendarDays(currentMonth, currentYear);
+        
+        // Обновляем состояние кнопок навигации
+        this.updateNavigationButtons();
+    }
+
+    // Генерация дней календаря
+    generateCalendarDays(month, year) {
+        const calendar = document.getElementById('dp1758166138189');
+        const tbody = calendar.querySelector('tbody');
+        if (!tbody) return;
+
+        // Очищаем текущие дни
+        tbody.innerHTML = '';
+
+        // Получаем первый день месяца и количество дней
+        const firstDay = new Date(year, month, 1);
+        const lastDay = new Date(year, month + 1, 0);
+        const daysInMonth = lastDay.getDate();
+        
+        // Получаем день недели первого дня (0 = воскресенье, нужно сделать понедельник = 0)
+        let startDay = firstDay.getDay();
+        startDay = startDay === 0 ? 6 : startDay - 1; // Делаем понедельник = 0
+        
+        // Получаем текущую дату для сравнения
+        const today = new Date();
+        const isCurrentMonth = today.getMonth() === month && today.getFullYear() === year;
+        const todayDate = today.getDate();
+
+        let date = 1;
+        
+        // Создаем 6 недель (строк)
+        for (let week = 0; week < 6; week++) {
+            const row = document.createElement('tr');
+            
+            // Создаем 7 дней (колонок)
+            for (let day = 0; day < 7; day++) {
+                const cell = document.createElement('td');
+                
+                if (week === 0 && day < startDay) {
+                    // Пустые ячейки в начале
+                    cell.className = 'ui-datepicker-other-month ui-datepicker-unselectable ui-state-disabled';
+                    cell.innerHTML = '&nbsp;';
+                } else if (date > daysInMonth) {
+                    // Пустые ячейки в конце
+                    cell.className = 'ui-datepicker-other-month ui-datepicker-unselectable ui-state-disabled';
+                    cell.innerHTML = '&nbsp;';
+                } else {
+                    // Обычные дни
+                    const isToday = isCurrentMonth && date === todayDate;
+                    const isPast = new Date(year, month, date) < new Date(today.getFullYear(), today.getMonth(), today.getDate());
+                    
+                    if (isPast) {
+                        // Прошедшие дни - заблокированы
+                        cell.className = 'ui-datepicker-unselectable ui-state-disabled disabled';
+                        if (day >= 5) cell.className += ' ui-datepicker-week-end';
+                        if (isToday) cell.className += ' ui-datepicker-today';
+                        cell.innerHTML = `<span class="ui-state-default">${date}</span>`;
+                    } else {
+                        // Доступные дни
+                        cell.className = 'undefined';
+                        if (day >= 5) cell.className += ' ui-datepicker-week-end';
+                        cell.setAttribute('data-handler', 'selectDay');
+                        cell.setAttribute('data-event', 'click');
+                        cell.setAttribute('data-month', month);
+                        cell.setAttribute('data-year', year);
+                        
+                        const dayName = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'][day];
+                        cell.innerHTML = `<a class="ui-state-default" href="#" title="${dayName} ${date}" aria-label="${dayName} ${date}">${date}</a>`;
+                    }
+                    
+                    date++;
+                }
+                
+                row.appendChild(cell);
+            }
+            
+            tbody.appendChild(row);
+            
+            // Если мы закончили все дни месяца, прерываем
+            if (date > daysInMonth) break;
+        }
+    }
+
+    // Обновление состояния кнопок навигации
+    updateNavigationButtons() {
+        const calendar = document.getElementById('dp1758166138189');
+        if (!calendar) return;
+
+        const prevButton = calendar.querySelector('.ui-datepicker-prev');
+        const nextButton = calendar.querySelector('.ui-datepicker-next');
+        
+        // Можно добавить логику для блокировки кнопок при необходимости
+        // Например, не позволять переходить в прошлые месяцы
+        const today = new Date();
+        const currentMonth = this.currentCalendarDate.getMonth();
+        const currentYear = this.currentCalendarDate.getFullYear();
+        
+        if (prevButton) {
+            if (currentYear < today.getFullYear() || 
+                (currentYear === today.getFullYear() && currentMonth <= today.getMonth())) {
+                prevButton.classList.add('ui-state-disabled');
+            } else {
+                prevButton.classList.remove('ui-state-disabled');
+            }
+        }
     }
     
     // Обновление обработчиков кликов для календаря
