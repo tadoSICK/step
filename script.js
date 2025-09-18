@@ -507,13 +507,17 @@ class BookingSystem {
             return;
         }
 
-        let selectedCountryValue = '';
-        let selectedCountryText = 'Choose a country';
-        let isOpen = false;
+        // Сохраняем выбранную страну
+        this.selectedCountry = 'Choose a country';
+        
+        // Создаем выпадающий список
+        this.createCountryDropdown(countryButton, countrySelect);
+    }
 
-        // Создаем кастомный выпадающий список
+    // Создание выпадающего списка стран
+    createCountryDropdown(button, select) {
         const dropdown = document.createElement('div');
-        dropdown.className = 'custom-country-dropdown';
+        dropdown.className = 'country-dropdown';
         dropdown.style.cssText = `
             position: absolute;
             top: 100%;
@@ -529,12 +533,11 @@ class BookingSystem {
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         `;
 
-        // Заполняем dropdown опциями
-        const options = countrySelect.querySelectorAll('option');
+        // Добавляем опции
+        const options = select.querySelectorAll('option');
         options.forEach(option => {
             if (option.value && option.textContent.trim() !== 'Choose a country') {
                 const item = document.createElement('div');
-                item.className = 'dropdown-item';
                 item.textContent = option.textContent.trim();
                 item.dataset.value = option.value;
                 item.style.cssText = `
@@ -552,54 +555,46 @@ class BookingSystem {
                 });
                 
                 item.addEventListener('click', () => {
-                    selectedCountryValue = item.dataset.value;
-                    selectedCountryText = item.textContent;
+                    this.selectedCountry = item.textContent;
                     
-                    // Обновляем текст кнопки
-                    const buttonText = countryButton.querySelector('.ui-selectmenu-text');
+                    // Обновляем кнопку
+                    const buttonText = button.querySelector('.ui-selectmenu-text');
                     if (buttonText) {
-                        buttonText.textContent = selectedCountryText;
+                        buttonText.textContent = this.selectedCountry;
                     }
                     
-                    // Устанавливаем значение в оригинальный select
-                    countrySelect.value = selectedCountryValue;
+                    // Обновляем select
+                    select.value = item.dataset.value;
                     
                     // Закрываем dropdown
                     dropdown.style.display = 'none';
-                    isOpen = false;
                     
-                    console.log('Country selected:', selectedCountryText, selectedCountryValue);
+                    console.log('Country selected:', this.selectedCountry);
                 });
                 
                 dropdown.appendChild(item);
             }
         });
 
-        // Добавляем dropdown после кнопки
-        countryButton.parentNode.style.position = 'relative';
-        countryButton.parentNode.appendChild(dropdown);
+        // Добавляем dropdown
+        button.parentNode.style.position = 'relative';
+        button.parentNode.appendChild(dropdown);
 
         // Обработчик клика по кнопке
-        countryButton.addEventListener('click', (e) => {
+        button.addEventListener('click', (e) => {
             e.preventDefault();
             e.stopPropagation();
             
-            isOpen = !isOpen;
-            dropdown.style.display = isOpen ? 'block' : 'none';
-            
-            console.log('Button clicked, dropdown open:', isOpen);
+            const isOpen = dropdown.style.display === 'block';
+            dropdown.style.display = isOpen ? 'none' : 'block';
         });
 
-        // Закрытие при клике вне элемента
+        // Закрытие при клике вне
         document.addEventListener('click', (e) => {
-            if (!countryButton.contains(e.target) && !dropdown.contains(e.target)) {
+            if (!button.contains(e.target) && !dropdown.contains(e.target)) {
                 dropdown.style.display = 'none';
-                isOpen = false;
             }
         });
-
-        // Сохраняем выбранное значение в валидации
-        this.getSelectedCountry = () => selectedCountryText;
     }
 
     // Инициализация валидации формы
@@ -652,7 +647,7 @@ class BookingSystem {
         const firstName = document.getElementById('firstName').value.trim();
         const surname = document.getElementById('surname').value.trim();
         const city = document.getElementById('city').value.trim();
-        const country = this.getSelectedCountry ? this.getSelectedCountry() : 'Choose a country';
+        const country = this.selectedCountry || 'Choose a country';
         const birthYear = document.getElementById('room-number').value.trim();
         const email = document.getElementById('emailAddress').value.trim();
         const emailConfirm = document.querySelector('[name="emailAddressConfirm"]').value.trim();
