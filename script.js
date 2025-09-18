@@ -207,10 +207,10 @@ class BookingSystem {
 
             // Получаем полную дату
             let fullDate = dateText;
-            const calendar = document.getElementById('dp1758166138189');
-            if (calendar) {
-                const monthElement = calendar.querySelector('.ui-datepicker-month');
-                const yearElement = calendar.querySelector('.ui-datepicker-year');
+            const calendarElement = document.getElementById('dp1758166138189');
+            if (calendarElement) {
+                const monthElement = calendarElement.querySelector('.ui-datepicker-month');
+                const yearElement = calendarElement.querySelector('.ui-datepicker-year');
                 
                 if (monthElement && yearElement) {
                     const month = monthElement.textContent.trim();
