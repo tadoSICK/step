@@ -270,28 +270,6 @@ class BookingSystem {
             }
         }
     }
-                // Убираем выделение с других дат
-                calendar.querySelectorAll('td').forEach(td => {
-                    td.classList.remove('selected-date');
-                });
-
-                // Выделяем выбранную дату
-                e.target.classList.add('selected-date');
-                e.target.style.backgroundColor = '#007bff';
-                e.target.style.color = 'white';
-
-                // Сохраняем выбранную дату
-                this.selectedDate = e.target.textContent.trim();
-
-                // Показываем блок выбора времени
-                const timeslotSection = document.getElementById('timeslot-section');
-                if (timeslotSection) {
-                    timeslotSection.style.display = 'block';
-                    this.initTimeSlots();
-                }
-            }
-        });
-    }
 
     // Инициализация слотов времени
     initTimeSlots() {
