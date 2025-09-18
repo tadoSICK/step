@@ -346,20 +346,6 @@ function handleTimeSlotClick() {
         console.log('Выбрано время:', bookingData.selectedTime);
     }
 }
-                // Убираем выделение с других слотов
-                timeSlots.forEach(s => s.classList.remove('selected-time'));
-                
-                // Выделяем выбранный слот
-                this.classList.add('selected-time');
-                this.style.backgroundColor = '#007bff';
-                this.style.color = 'white';
-                
-                // Сохраняем выбранное время
-                bookingData.selectedTime = this.textContent.trim();
-            });
-        });
-    }
-}
 
 function setupCountrySelector() {
     const countryButton = document.getElementById('country-button');
