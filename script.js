@@ -113,3 +113,28 @@ function setupCountrySelection() {
         }
     });
 }
+
+// Инициализация при загрузке страницы
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Страница загружена, инициализация...');
+    
+    // Показываем первый шаг
+    showStep('stepOne');
+    
+    // Создаем селекторы билетов
+    createTicketSelector('tickettype_396894-button', 'priceAdults', 'subtotalAdult', 'adult');
+    createTicketSelector('tickettype_398153-button', 'priceUnder18', 'subtotalUnder18', 'under18');
+    createTicketSelector('tickettype_398152-button', 'priceMuse', 'subtotalMuse', 'muse');
+    createTicketSelector('tickettype_398159-button', 'stunedtPrice', 'subtotalStudent', 'student');
+    createTicketSelector('tickettype_397088-button', 'auditorPrice', 'subtotalAuditor', 'auditor');
+    createTicketSelector('tickettype_398323-button', 'childPrice', 'subtotalChild', 'child');
+    
+    // Настраиваем выбор страны
+    setupCountrySelection();
+    
+    // Настраиваем календарь
+    setupCalendar();
+    
+    // Настраиваем кнопки навигации
+    setupStepNavigation();
+});
