@@ -18,28 +18,24 @@ function createTicketSelector(buttonId, priceId, subtotalId, ticketType) {
 
     console.log(`Элемент ${buttonId} найден:`, buttonElement);
 
-    // Ищем существующий select или создаем новый
-    let select = buttonElement.querySelector('select.ticket-quantity-select');
-    
-    if (!select) {
-        // Создаем новый select
-        select = document.createElement('select');
-        select.className = 'ticket-quantity-select';
-        select.id = `select-${ticketType}`;
+    // Создаем select элемент
+    const select = document.createElement('select');
+    select.className = 'form-control ticket-quantity-select';
+    select.id = `select-${ticketType}`;
+    select.style.width = '80px';
+    select.style.display = 'inline-block';
 
-        // Создаем опции от 0 до 10
-        for (let i = 0; i <= 10; i++) {
-            const option = document.createElement('option');
-            option.value = i;
-            option.textContent = i;
-            select.appendChild(option);
-        }
-
-        // Заменяем содержимое элемента на select
-        buttonElement.innerHTML = '';
-        buttonElement.appendChild(select);
-        console.log(`Select создан и добавлен для ${ticketType}`);
+    // Создаем опции от 0 до 10
+    for (let i = 0; i <= 10; i++) {
+        const option = document.createElement('option');
+        option.value = i;
+        option.textContent = i;
+        select.appendChild(option);
     }
+
+    // Заменяем кнопку на select
+    buttonElement.parentNode.replaceChild(select, buttonElement);
+    console.log(`Select создан и добавлен для ${ticketType}`);
 
     // Обработчик изменения количества
     select.addEventListener('change', function() {
@@ -232,13 +228,13 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Небольшая задержка для загрузки всех элементов
     setTimeout(() => {
-        // Создаем селекторы для всех типов билетов
-        createTicketSelector('adult', 'adult-price', 'subtotal-adult', 'adult');
-        createTicketSelector('under18', 'under18-price', 'subtotal-under18', 'under18');
-        createTicketSelector('muse', 'muse-price', 'subtotal-muse', 'muse');
-        createTicketSelector('student', 'student-price', 'subtotal-student', 'student');
-        createTicketSelector('auditor', 'auditor-price', 'subtotal-auditor', 'auditor');
-        createTicketSelector('child', 'child-price', 'subtotal-child', 'child');
+        // Создаем селекторы для всех типов билетов с правильными ID
+        createTicketSelector('adult-button', 'adult-price', 'subtotal-adult', 'adult');
+        createTicketSelector('under18-button', 'under18-price', 'subtotal-under18', 'under18');
+        createTicketSelector('muse-button', 'muse-price', 'subtotal-muse', 'muse');
+        createTicketSelector('student-button', 'student-price', 'subtotal-student', 'student');
+        createTicketSelector('auditor-button', 'auditor-price', 'subtotal-auditor', 'auditor');
+        createTicketSelector('child-button', 'child-price', 'subtotal-child', 'child');
         
         // Настраиваем календарь и выбор времени
         setupCalendar();
@@ -246,7 +242,7 @@ document.addEventListener('DOMContentLoaded', function() {
         setupCountrySelection();
         
         console.log('Все селекторы инициализированы');
-    }, 500);
+    }, 1000);
 });
 
 // Функция валидации перед переходом к следующему шагу
