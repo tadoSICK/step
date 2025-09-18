@@ -146,6 +146,7 @@ class BookingSystem {
         if (goFooStep) {
             goFooStep.addEventListener('click', () => {
                 console.log('Клик по кнопке goFooStep');
+               event.preventDefault(); // Предотвращаем отправку формы
                 if (this.validateStep3()) {
                     console.log('Валидация шага 3 прошла успешно');
                     this.fillFinalInfo();
