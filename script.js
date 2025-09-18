@@ -23,7 +23,7 @@ class BookingSystem {
 
     // Показать определенный шаг
     showStep(stepId) {
-        const steps = ['stepOne', 'stepTwo', 'stepThree', 'stepFoo', 'stepFive'];
+        const steps = ['stepOne', 'stepTwo', 'stepThree', 'stepFour', 'stepFive'];
         steps.forEach(step => {
             const element = document.getElementById(step);
             if (element) {
@@ -143,7 +143,7 @@ class BookingSystem {
             goFooStep.addEventListener('click', () => {
                 if (this.validateStep3()) {
                     this.fillFinalInfo();
-                    this.showStep('stepFoo');
+                    this.showStep('stepFour');
                 }
             });
         }
