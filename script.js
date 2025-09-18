@@ -162,9 +162,114 @@ class BookingSystem {
         const calendar = document.getElementById('dp1758166138189');
         if (!calendar) return;
 
+        // Обработчик для навигации по месяцам (кнопки вперед/назад)
+        const setupMonthNavigation = () => {
+            const nextButton = calendar.querySelector('.ui-datepicker-next');
+            const prevButton = calendar.querySelector('.ui-datepicker-prev');
+            
+            if (nextButton) {
+                nextButton.addEventListener('click', () => {
+                    setTimeout(() => {
+                        this.setupDateSelection();
+                    }, 100);
+                });
+            }
+            
+            if (prevButton) {
+                prevButton.addEventListener('click', () => {
+                    setTimeout(() => {
+                        this.setupDateSelection();
+                    }, 100);
+                });
+            }
+        };
+
+        // Настройка выбора дат
+        this.setupDateSelection();
+        setupMonthNavigation();
+        
+        // Наблюдатель за изменениями в календаре (для динамического обновления)
+        const observer = new MutationObserver(() => {
+            this.setupDateSelection();
+            setupMonthNavigation();
+        });
+        
+        observer.observe(calendar, { 
+            childList: true, 
+            subtree: true 
+        });
+    }
+
+    // Отдельная функция для настройки выбора дат
+    setupDateSelection() {
+        const calendar = document.getElementById('dp1758166138189');
+        if (!calendar) return;
+
         // Обработчик клика по датам в календаре
-        calendar.addEventListener('click', (e) => {
-            if (e.target.tagName === 'TD' && e.target.textContent.trim()) {
+        const dateCells = calendar.querySelectorAll('td');
+        dateCells.forEach(cell => {
+            // Убираем старые обработчики
+            cell.removeEventListener('click', this.handleDateClick);
+            
+            // Добавляем новые обработчики только для дат (не пустых ячеек)
+            if (cell.textContent.trim() && !cell.classList.contains('ui-datepicker-other-month')) {
+                cell.style.cursor = 'pointer';
+                cell.addEventListener('click', this.handleDateClick.bind(this));
+            }
+        });
+    }
+
+    // Обработчик клика по дате
+    handleDateClick(e) {
+        const calendar = document.getElementById('dp1758166138189');
+        if (!calendar) return;
+
+        const clickedCell = e.target;
+        
+        // Проверяем, что это действительно дата
+        if (clickedCell.tagName === 'TD' && clickedCell.textContent.trim() && 
+            !clickedCell.classList.contains('ui-datepicker-other-month')) {
+            
+            // Убираем выделение с других дат
+            calendar.querySelectorAll('td').forEach(td => {
+                td.classList.remove('selected-date');
+                td.style.backgroundColor = '';
+                td.style.color = '';
+            });
+
+            // Выделяем выбранную дату
+            clickedCell.classList.add('selected-date');
+            clickedCell.style.backgroundColor = '#007bff';
+            clickedCell.style.color = 'white';
+
+            // Получаем информацию о выбранной дате
+            const day = clickedCell.textContent.trim();
+            const monthYear = calendar.querySelector('.ui-datepicker-title');
+            let dateString = day;
+            
+            if (monthYear) {
+                const monthElement = monthYear.querySelector('.ui-datepicker-month');
+                const yearElement = monthYear.querySelector('.ui-datepicker-year');
+                
+                if (monthElement && yearElement) {
+                    const month = monthElement.textContent.trim();
+                    const year = yearElement.textContent.trim();
+                    dateString = `${day} ${month} ${year}`;
+                }
+            }
+
+            // Сохраняем выбранную дату
+            this.selectedDate = dateString;
+            console.log('Выбрана дата:', this.selectedDate);
+
+            // Показываем блок выбора времени
+            const timeslotSection = document.getElementById('timeslot-section');
+            if (timeslotSection) {
+                timeslotSection.style.display = 'block';
+                this.initTimeSlots();
+            }
+        }
+    }
                 // Убираем выделение с других дат
                 calendar.querySelectorAll('td').forEach(td => {
                     td.classList.remove('selected-date');
